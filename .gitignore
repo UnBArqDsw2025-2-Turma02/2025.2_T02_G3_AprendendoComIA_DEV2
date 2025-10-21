@@ -1,0 +1,85 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js (old project)
+.next/
+out/
+
+# Production
+build/
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.env
+
+# Java
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+*.test
+.nyc_output/
+
+# Temp
+tmp/
+temp/
+.cache/
+
+# Build info
+tsconfig.tsbuildinfo
+
+# Keep old project but ignore its dependencies
+old-nextjs-project/node_modules/
+old-nextjs-project/.next/
+old-nextjs-project/dist/
+old-nextjs-project/build/
+
