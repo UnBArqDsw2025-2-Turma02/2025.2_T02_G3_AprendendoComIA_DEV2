@@ -334,4 +334,4 @@ Para dúvidas ou problemas:
 
 ## Nota sobre Projeto Antigo
 
-O projeto original em Next.js foi completamente removido. Use o novo stack (Java + React) documentado aqui.
+O projeto antigo morreu graças ao Arthur Leite.
