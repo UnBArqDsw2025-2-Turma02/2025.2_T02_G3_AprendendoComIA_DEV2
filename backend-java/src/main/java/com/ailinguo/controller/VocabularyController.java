@@ -168,23 +168,20 @@ public class VocabularyController {
         return ResponseEntity.ok(mastered);
     }
 
-    /**
-     * Exemplo de uso do padrão Iterator GoF
-     * Retorna palavras iteradas com informações adicionais
-     */
+
     @GetMapping("/words/iterate/category/{categoryId}")
     public ResponseEntity<Map<String, Object>> iterateWordsByCategory(@PathVariable Long categoryId) {
         try {
-            // Busca as palavras da categoria
+            
             List<VocabularyWord> words = vocabularyWordRepository.findByCategoryId(categoryId);
             
-            // Cria a coleção usando o padrão Iterator
+            
             VocabularyWordCollection collection = new VocabularyWordCollection(words);
             
-            // Cria o iterator
+            
             IIterator iterator = collection.createIterator();
             
-            // Itera sobre as palavras coletando informações
+            
             List<Map<String, Object>> wordDetails = new ArrayList<>();
             int position = 1;
             
@@ -203,7 +200,7 @@ public class VocabularyController {
                 wordDetails.add(detail);
             }
             
-            // Prepara a resposta
+            
             Map<String, Object> response = new HashMap<>();
             response.put("totalWords", collection.size());
             response.put("categoryId", categoryId);
