@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class GroupSingletonTest {
+    
 
     @Test
     public void testSingletonPattern() {
