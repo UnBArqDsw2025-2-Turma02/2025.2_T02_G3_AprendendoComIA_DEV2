@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Clock, Play, Lock, CheckCircle, Heart, Gem, TrendingUp, ArrowRight } from 'lucide-react'
 import axios from 'axios'
 import StreakImage from '../assets/images/streak.svg'
@@ -15,6 +15,7 @@ import ProgressImage from '../assets/images/progress.svg'
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -58,6 +59,24 @@ export default function Dashboard() {
     { id: 4, title: "Colors", type: "vocabulary", completed: false, xp: 20 },
     { id: 5, title: "Food", type: "conversation", completed: false, xp: 30, locked: true },
   ]
+
+  const startRandomExercise = () => {
+    // Lista de exercícios aleatórios disponíveis
+    const randomExercises = [
+      { type: 'vocabulary', title: 'Revisão de Vocabulário', description: 'Pratique palavras aleatórias' },
+      { type: 'grammar', title: 'Exercício de Gramática', description: 'Complete as frases corretamente' },
+      { type: 'conversation', title: 'Conversação Rápida', description: 'Pratique diálogos em inglês' },
+      { type: 'listening', title: 'Compreensão Auditiva', description: 'Escute e responda perguntas' },
+      { type: 'reading', title: 'Leitura e Compreensão', description: 'Leia textos e responda questões' }
+    ]
+    
+    // Seleciona um exercício aleatório
+    const randomIndex = Math.floor(Math.random() * randomExercises.length)
+    const selectedExercise = randomExercises[randomIndex]
+    
+    // Redireciona para a página de exercícios com o tipo aleatório
+    navigate(`/tasks?type=${selectedExercise.type}&random=true`)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -161,9 +180,18 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Suas Lições</h2>
-            <Link to="/tasks" className="text-green-600 font-semibold hover:text-green-700 transition-colors">
-              Ver todas →
-            </Link>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => startRandomExercise()}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold px-4 py-2 rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2"
+              >
+                <Play size={16} />
+                Exercício Aleatório
+              </button>
+              <Link to="/tasks" className="text-green-600 font-semibold hover:text-green-700 transition-colors">
+                Ver todas →
+              </Link>
+            </div>
           </div>
           
           {/* Progress Overview */}

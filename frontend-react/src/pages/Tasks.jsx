@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import Navbar from '../components/Navbar'
 import axios from 'axios'
-import { Check, X, BookOpen, Zap, Star, Flame, Trophy, Target, Clock, Sparkles, ArrowRight, RotateCcw } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
+import { Check, X, BookOpen, Zap, Star, Flame, Trophy, Target, Clock, Sparkles, ArrowRight, RotateCcw, Shuffle } from 'lucide-react'
 
 export default function Tasks() {
   const { user } = useAuth()
+  const location = useLocation()
   const [questions, setQuestions] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState(null)
@@ -14,6 +16,8 @@ export default function Tasks() {
   const [loading, setLoading] = useState(true)
   const [xp, setXp] = useState(0)
   const [streak, setStreak] = useState(0)
+  const [isRandomExercise, setIsRandomExercise] = useState(false)
+  const [exerciseType, setExerciseType] = useState('')
 
   // Mock questions for demonstration
   const mockQuestions = [
@@ -70,19 +74,47 @@ export default function Tasks() {
   ]
 
   useEffect(() => {
+    // Verifica se é um exercício aleatório baseado nos parâmetros da URL
+    const urlParams = new URLSearchParams(location.search)
+    const isRandom = urlParams.get('random') === 'true'
+    const type = urlParams.get('type')
+    
+    setIsRandomExercise(isRandom)
+    setExerciseType(type || '')
+    
     loadQuestions()
-  }, [])
+  }, [location.search])
 
   const loadQuestions = async () => {
     try {
-      // Load exercises by user's CEFR level
-      const cefrLevel = user.cefrLevel || 'A1'
-      const response = await axios.get(`/api/exercises/random/${cefrLevel}/5`, {
-        withCredentials: true
-      })
+      let exercises = []
       
-      // Transform exercises to questions format
-      const exercises = response.data
+      if (isRandomExercise && exerciseType) {
+        // Carrega exercícios aleatórios do tipo específico
+        const cefrLevel = user?.cefrLevel || 'A1'
+        try {
+          const response = await axios.get(`/api/exercises/random/${exerciseType}/${cefrLevel}/5`, {
+            withCredentials: true
+          })
+          exercises = response.data
+        } catch (error) {
+          console.log('API not available, using mock data for random exercise')
+          // Filtra questões mock pelo tipo
+          exercises = mockQuestions.filter(q => q.type === exerciseType).slice(0, 5)
+        }
+      } else {
+        // Carrega exercícios normais
+        const cefrLevel = user?.cefrLevel || 'A1'
+        try {
+          const response = await axios.get(`/api/exercises/random/${cefrLevel}/5`, {
+            withCredentials: true
+          })
+          exercises = response.data
+        } catch (error) {
+          console.log('API not available, using mock data')
+          exercises = mockQuestions.slice(0, 5)
+        }
+      }
       const questions = exercises.map(exercise => ({
         id: exercise.id,
         title: exercise.title,
@@ -189,8 +221,21 @@ export default function Tasks() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Exercícios</h1>
-              <p className="text-xl text-gray-600">Teste seus conhecimentos com quizzes interativos</p>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-4xl font-bold text-gray-900">Exercícios</h1>
+                {isRandomExercise && (
+                  <div className="flex items-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    <Shuffle size={16} />
+                    Aleatório
+                  </div>
+                )}
+              </div>
+              <p className="text-xl text-gray-600">
+                {isRandomExercise 
+                  ? `Exercício aleatório de ${exerciseType} - Teste seus conhecimentos!`
+                  : 'Teste seus conhecimentos com quizzes interativos'
+                }
+              </p>
             </div>
             
             {/* Stats */}
