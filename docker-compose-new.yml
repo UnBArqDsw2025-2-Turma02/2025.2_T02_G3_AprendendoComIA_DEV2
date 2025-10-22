@@ -7,20 +7,22 @@ networks:
     driver: bridge
 
 services:
-  # MongoDB Database
-  mongo:
-    image: mongo:7
-    container_name: ailinguo-mongo
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: ailinguo-postgres
     environment:
-      - MONGO_INITDB_DATABASE=ailinguo
+      - POSTGRES_DB=ailinguo
+      - POSTGRES_USER=ailinguo
+      - POSTGRES_PASSWORD=ailinguo123
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - mongo_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - ailinguo-network
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      test: ["CMD-SHELL", "pg_isready -U ailinguo -d ailinguo"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,8 +36,9 @@ services:
       dockerfile: Dockerfile
     container_name: ailinguo-backend
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/ailinguo
-      - DB_NAME=ailinguo
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/ailinguo
+      - DB_USERNAME=ailinguo
+      - DB_PASSWORD=ailinguo123
       - JWT_SECRET=58a19f8830f8b701c64d6130285277fcfe80ae7509e9afbdb212a2557448df90ec94a4b8e414be657462ae1d52fad28cb43cdc110e5f4275ef2c5a441949a0a7
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
       - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
@@ -45,7 +48,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      mongo:
+      postgres:
         condition: service_healthy
     networks:
       - ailinguo-network
@@ -66,5 +69,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  mongo_data:
+  postgres_data:
 

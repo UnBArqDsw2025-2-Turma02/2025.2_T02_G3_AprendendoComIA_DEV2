@@ -29,7 +29,8 @@ public class TutorController {
             Authentication authentication
     ) {
         try {
-            String userId = authentication != null ? (String) authentication.getPrincipal() : null;
+            String userIdStr = authentication != null ? (String) authentication.getPrincipal() : null;
+            Long userId = userIdStr != null ? Long.parseLong(userIdStr) : null;
             TutorResponse response = tutorService.processTutorRequest(request, userId);
             return ResponseEntity.ok(response);
         } catch (Exception e) {

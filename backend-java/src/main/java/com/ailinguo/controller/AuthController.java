@@ -3,7 +3,6 @@ package com.ailinguo.controller;
 import com.ailinguo.dto.UserDto;
 import com.ailinguo.dto.auth.AuthResponse;
 import com.ailinguo.dto.auth.LoginRequest;
-import com.ailinguo.dto.auth.RegisterRequest;
 import com.ailinguo.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -25,7 +24,7 @@ public class AuthController {
     
     @PostMapping("/register")
     public ResponseEntity<?> register(
-            @Valid @RequestBody RegisterRequest request,
+            @Valid @RequestBody Map<String, Object> request,
             HttpServletResponse response
     ) {
         try {

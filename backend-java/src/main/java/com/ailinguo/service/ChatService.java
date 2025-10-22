@@ -6,7 +6,6 @@ import com.ailinguo.repository.ChatSessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class ChatService {
@@ -17,10 +16,11 @@ public class ChatService {
         this.chatSessionRepository = chatSessionRepository;
     }
     
-    public ChatSession createSession(String userId, User.CefrLevel level, String topic) {
+    public ChatSession createSession(Long userId, User.CefrLevel level, String topic) {
+        User user = User.builder().id(userId).build();
+        
         ChatSession session = ChatSession.builder()
-                .id(UUID.randomUUID().toString())
-                .userId(userId)
+                .user(user)
                 .level(level)
                 .topic(topic != null ? topic : "general")
                 .summary("")

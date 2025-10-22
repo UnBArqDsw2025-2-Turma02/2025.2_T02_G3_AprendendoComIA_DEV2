@@ -7,6 +7,8 @@ import Chat from './pages/Chat'
 import Vocabulary from './pages/Vocabulary'
 import Gamification from './pages/Gamification'
 import Tasks from './pages/Tasks'
+import Admin from './pages/Admin'
+import UserSettings from './pages/UserSettings'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
@@ -87,6 +89,22 @@ function App() {
             element={
               <PrivateRoute>
                 <Tasks />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <PrivateRoute>
+                <Admin />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <PrivateRoute>
+                <UserSettings />
               </PrivateRoute>
             } 
           />

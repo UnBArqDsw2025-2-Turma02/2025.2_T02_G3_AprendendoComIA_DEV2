@@ -38,7 +38,7 @@ public class ChatController {
             User.CefrLevel level = User.CefrLevel.valueOf((String) request.get("level"));
             String topic = (String) request.getOrDefault("topic", "general");
             
-            ChatSession session = chatService.createSession(userId, level, topic);
+            ChatSession session = chatService.createSession(Long.parseLong(userId), level, topic);
             return ResponseEntity.ok(session);
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

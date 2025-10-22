@@ -4,7 +4,6 @@ import com.ailinguo.config.JwtUtil;
 import com.ailinguo.dto.UserDto;
 import com.ailinguo.dto.auth.AuthResponse;
 import com.ailinguo.dto.auth.LoginRequest;
-import com.ailinguo.dto.auth.RegisterRequest;
 import com.ailinguo.model.User;
 import com.ailinguo.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -13,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -28,17 +27,28 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
     
-    public AuthResponse register(RegisterRequest request, HttpServletResponse response) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+    public AuthResponse register(Map<String, Object> request, HttpServletResponse response) {
+        String email = request.get("email").toString();
+        String name = request.get("name").toString();
+        String password = request.get("password").toString();
+        String cefrLevelStr = request.get("cefrLevel") != null ? request.get("cefrLevel").toString() : "A2";
+        
+        if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("User already exists");
         }
         
+        User.CefrLevel cefrLevel;
+        try {
+            cefrLevel = User.CefrLevel.valueOf(cefrLevelStr);
+        } catch (IllegalArgumentException e) {
+            cefrLevel = User.CefrLevel.A2;
+        }
+        
         User user = User.builder()
-                .id(UUID.randomUUID().toString())
-                .email(request.getEmail())
-                .name(request.getName())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .cefrLevel(request.getCefrLevel() != null ? request.getCefrLevel() : User.CefrLevel.A2)
+                .email(email)
+                .name(name)
+                .password(passwordEncoder.encode(password))
+                .cefrLevel(cefrLevel)
                 .dailyGoalMinutes(15)
                 .streakDays(0)
                 .totalMinutes(0)
@@ -47,7 +57,7 @@ public class AuthService {
         
         userRepository.save(user);
         
-        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
+        String token = jwtUtil.generateToken(user.getId().toString(), user.getEmail());
         setAuthCookie(response, token);
         
         return AuthResponse.builder()
@@ -63,7 +73,7 @@ public class AuthService {
             throw new RuntimeException("Invalid password");
         }
         
-        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
+        String token = jwtUtil.generateToken(user.getId().toString(), user.getEmail());
         setAuthCookie(response, token);
         
         return AuthResponse.builder()
@@ -76,7 +86,7 @@ public class AuthService {
             return null;
         }
         
-        return userRepository.findById(userId)
+        return userRepository.findById(Long.parseLong(userId))
                 .map(UserDto::fromUser)
                 .orElse(null);
     }

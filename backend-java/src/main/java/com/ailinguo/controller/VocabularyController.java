@@ -34,7 +34,7 @@ public class VocabularyController {
                 return ResponseEntity.status(403).body(Map.of("error", "Forbidden"));
             }
             
-            List<VocabularyCard> cards = vocabularyService.getDueCards(userId, limit);
+            List<VocabularyCard> cards = vocabularyService.getDueCards(Long.parseLong(userId), limit);
             return ResponseEntity.ok(cards);
         } catch (Exception e) {
             return ResponseEntity.internalServerError()

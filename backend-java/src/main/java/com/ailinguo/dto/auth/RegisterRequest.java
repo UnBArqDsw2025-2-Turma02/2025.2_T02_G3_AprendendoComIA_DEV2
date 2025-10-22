@@ -21,5 +21,18 @@ public class RegisterRequest {
     private String password;
     
     private User.CefrLevel cefrLevel = User.CefrLevel.A2;
+    
+    // Getters e Setters manuais
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    
+    public User.CefrLevel getCefrLevel() { return cefrLevel; }
+    public void setCefrLevel(User.CefrLevel cefrLevel) { this.cefrLevel = cefrLevel; }
 }
 

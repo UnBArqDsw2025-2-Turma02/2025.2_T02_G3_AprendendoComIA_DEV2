@@ -18,5 +18,18 @@ public class TutorRequest {
     public enum Mode {
         CONVERSATION, WRITING
     }
+    
+    // Getters e Setters manuais
+    public String getUserText() { return userText; }
+    public void setUserText(String userText) { this.userText = userText; }
+    
+    public User.CefrLevel getUserLevel() { return userLevel; }
+    public void setUserLevel(User.CefrLevel userLevel) { this.userLevel = userLevel; }
+    
+    public Mode getMode() { return mode; }
+    public void setMode(Mode mode) { this.mode = mode; }
+    
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
 }
 

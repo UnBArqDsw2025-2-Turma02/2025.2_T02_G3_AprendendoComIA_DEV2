@@ -7,7 +7,6 @@ import com.ailinguo.repository.ChatTurnRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,7 @@ public class TutorService {
         this.chatTurnRepository = chatTurnRepository;
     }
     
-    public TutorResponse processTutorRequest(TutorRequest request, String userId) {
+    public TutorResponse processTutorRequest(TutorRequest request, Long userId) {
         TutorResponse response = openAIService.generateTutorResponse(request);
         
         // Save chat history if session ID is provided
@@ -33,15 +32,13 @@ public class TutorService {
         return response;
     }
     
-    private void saveChatTurns(TutorRequest request, TutorResponse response, String userId) {
+    private void saveChatTurns(TutorRequest request, TutorResponse response, Long userId) {
         String sessionId = request.getSessionId();
         long timestamp = System.currentTimeMillis();
         
         // Save user turn
         ChatTurn userTurn = ChatTurn.builder()
-                .id(sessionId + ":u:" + timestamp)
-                .sessionId(sessionId)
-                .userId(userId)
+                .id((long) (sessionId.hashCode() + timestamp))
                 .role(ChatTurn.Role.USER)
                 .text(request.getUserText())
                 .createdAt(LocalDateTime.now())
@@ -71,9 +68,7 @@ public class TutorService {
         
         // Save tutor turn
         ChatTurn tutorTurn = ChatTurn.builder()
-                .id(sessionId + ":t:" + (timestamp + 1))
-                .sessionId(sessionId)
-                .userId(userId)
+                .id((long) (sessionId.hashCode() + timestamp + 1))
                 .role(ChatTurn.Role.TUTOR)
                 .text(response.getReply())
                 .corrections(corrections)

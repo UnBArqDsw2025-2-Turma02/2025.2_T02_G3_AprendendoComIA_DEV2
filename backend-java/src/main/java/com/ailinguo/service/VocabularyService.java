@@ -25,26 +25,26 @@ public class VocabularyService {
         this.srsReviewRepository = srsReviewRepository;
     }
     
-    public List<VocabularyCard> getDueCards(String userId, int limit) {
+    public List<VocabularyCard> getDueCards(Long userId, int limit) {
         // For now, return mock cards
         // In production, you'd filter by actual due dates from srsReviews
         return Arrays.asList(
                 VocabularyCard.builder()
-                        .id("card1")
+                        .id(1L)
                         .term("apple")
                         .meaning("maçã")
                         .example("I eat an apple every day")
                         .cefrLevel(User.CefrLevel.A1)
                         .build(),
                 VocabularyCard.builder()
-                        .id("card2")
+                        .id(2L)
                         .term("beautiful")
                         .meaning("bonito/bonita")
                         .example("The sunset is beautiful")
                         .cefrLevel(User.CefrLevel.A2)
                         .build(),
                 VocabularyCard.builder()
-                        .id("card3")
+                        .id(3L)
                         .term("necessary")
                         .meaning("necessário")
                         .example("It is necessary to study English")
@@ -82,18 +82,22 @@ public class VocabularyService {
         
         LocalDateTime nextDue = LocalDateTime.now().plusDays(interval);
         
-        // Save or update review
-        SrsReview review = srsReviewRepository
-                .findByUserIdAndCardId(request.getUserId(), request.getCardId())
-                .orElse(new SrsReview());
+            // Save or update review
+            SrsReview review = srsReviewRepository
+                    .findByUserIdAndVocabularyCardId(Long.parseLong(request.getUserId()), Long.parseLong(request.getCardId()))
+                    .orElse(new SrsReview());
         
-        review.setUserId(request.getUserId());
-        review.setCardId(request.getCardId());
-        review.setDueAt(nextDue);
-        review.setInterval(interval);
-        review.setEase(ease);
-        review.setLastResult(request.getResult());
-        review.setReviewedAt(LocalDateTime.now());
+        // Note: These setters will need to be updated to work with User and VocabularyCard entities
+        // For now, we'll create a new review with the proper entities
+        review = SrsReview.builder()
+                .user(User.builder().id(Long.parseLong(request.getUserId())).build())
+                .vocabularyCard(VocabularyCard.builder().id(Long.parseLong(request.getCardId())).build())
+                .dueAt(nextDue)
+                .interval(interval)
+                .ease(ease)
+                .lastResult(request.getResult())
+                .reviewedAt(LocalDateTime.now())
+                .build();
         
         srsReviewRepository.save(review);
         

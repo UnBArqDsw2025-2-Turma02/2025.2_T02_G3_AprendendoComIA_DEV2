@@ -1,73 +1,69 @@
 package com.ailinguo.controller;
 
+import com.ailinguo.service.TaskService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tasks")
+@CrossOrigin(origins = "*")
 public class TaskController {
     
-    private final List<Map<String, Object>> quizQuestions;
+    private final TaskService taskService;
     
-    public TaskController() {
-        quizQuestions = Arrays.asList(
-                Map.of(
-                        "id", "q1",
-                        "prompt", "Choose the correct past form: \"Yesterday I ___ to the store.\"",
-                        "options", Arrays.asList("go", "goes", "gone", "went"),
-                        "answerIndex", 3,
-                        "explanation", "Past simple of \"go\" is \"went\"."
-                ),
-                Map.of(
-                        "id", "q2",
-                        "prompt", "Select the correct sentence:",
-                        "options", Arrays.asList(
-                                "She don't like coffee.",
-                                "She doesn't likes coffee.",
-                                "She doesn't like coffee.",
-                                "She not like coffee."
-                        ),
-                        "answerIndex", 2,
-                        "explanation", "\"She doesn't like\" is the correct negative form in present simple."
-                ),
-                Map.of(
-                        "id", "q3",
-                        "prompt", "Fill the gap: \"I have a lot of ___ with English grammar.\"",
-                        "options", Arrays.asList("difficult", "difficulty", "difficulties", "difficultly"),
-                        "answerIndex", 1,
-                        "explanation", "Use the noun \"difficulty\" after \"have\"."
-                ),
-                Map.of(
-                        "id", "q4",
-                        "prompt", "Choose the uncountable noun:",
-                        "options", Arrays.asList("advices", "information", "peoples", "furnitures"),
-                        "answerIndex", 1,
-                        "explanation", "\"Information\" is uncountable (no plural form)."
-                ),
-                Map.of(
-                        "id", "q5",
-                        "prompt", "Capitalize correctly: \"i speak english.\"",
-                        "options", Arrays.asList(
-                                "I speak english.",
-                                "I speak English.",
-                                "i speak English.",
-                                "I Speak English."
-                        ),
-                        "answerIndex", 1,
-                        "explanation", "Capitalize \"I\" and \"English\"."
-                )
-        );
+    public TaskController(TaskService taskService) {
+        this.taskService = taskService;
     }
     
-    @GetMapping("/quiz")
-    public ResponseEntity<Map<String, List<Map<String, Object>>>> getQuiz() {
-        return ResponseEntity.ok(Map.of("questions", quizQuestions));
+    @GetMapping("/random/{userId}")
+    public ResponseEntity<Map<String, Object>> getRandomTasks(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "5") int limit,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) String type) {
+        try {
+            Map<String, Object> tasks = taskService.getRandomTasks(userId, limit, difficulty, type);
+            return ResponseEntity.ok(tasks);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    @PostMapping("/attempt")
+    public ResponseEntity<Map<String, Object>> submitTaskAttempt(@RequestBody Map<String, Object> request) {
+        try {
+            Long userId = Long.valueOf(request.get("userId").toString());
+            Long taskId = Long.valueOf(request.get("taskId").toString());
+            Integer selectedAnswerIndex = Integer.valueOf(request.get("selectedAnswerIndex").toString());
+            Integer timeSpent = request.get("timeSpent") != null ? 
+                Integer.valueOf(request.get("timeSpent").toString()) : null;
+            
+            Map<String, Object> result = taskService.submitTaskAttempt(userId, taskId, selectedAnswerIndex, timeSpent);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/stats/{userId}")
+    public ResponseEntity<Map<String, Object>> getUserTaskStats(@PathVariable Long userId) {
+        try {
+            Map<String, Object> stats = taskService.getUserTaskStats(userId);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+    
+    @GetMapping("/history/{userId}")
+    public ResponseEntity<Map<String, Object>> getUserTaskHistory(@PathVariable Long userId) {
+        try {
+            Map<String, Object> history = taskService.getUserTaskHistory(userId);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }
-

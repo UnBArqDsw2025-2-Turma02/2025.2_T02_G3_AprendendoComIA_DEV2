@@ -11,6 +11,34 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // Configure axios defaults
+  useEffect(() => {
+    // Set up axios interceptor to include credentials in all requests
+    axios.defaults.withCredentials = true
+    
+    // Add request interceptor to include auth headers
+    axios.interceptors.request.use(
+      (config) => {
+        // Add any auth headers if needed
+        return config
+      },
+      (error) => {
+        return Promise.reject(error)
+      }
+    )
+
+    // Add response interceptor to handle auth errors
+    axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          setUser(null)
+        }
+        return Promise.reject(error)
+      }
+    )
+  }, [])
+
   useEffect(() => {
     checkAuth()
   }, [])
@@ -42,8 +70,13 @@ export function AuthProvider({ children }) {
   }
 
   const logout = async () => {
-    await axios.post('/api/auth/logout', {}, { withCredentials: true })
-    setUser(null)
+    try {
+      await axios.post('/api/auth/logout', {}, { withCredentials: true })
+    } catch (error) {
+      console.log('Logout error:', error)
+    } finally {
+      setUser(null)
+    }
   }
 
   const value = {
