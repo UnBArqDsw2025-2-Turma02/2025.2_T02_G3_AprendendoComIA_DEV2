@@ -1,6 +1,6 @@
 # Padrão Iterator - GoF
 
-## 📦 Arquivos do Padrão
+## Arquivos do Padrão
 
 ### 1. `IIterator.java` (Interface)
 ```java
@@ -29,7 +29,7 @@ public interface VocabularyCollection {
 - Gerencia a coleção de palavras
 - Cria iteradores para percorrer a coleção
 
-## 🌐 Endpoints Disponíveis
+## Endpoints Disponíveis
 
 ### 1. Iterar por Categoria
 ```bash
@@ -51,7 +51,7 @@ curl http://localhost:8080/api/vocabulary/words/iterate/cefr/A1
 ```
 **Retorna:** Lista formatada de palavras do nível
 
-## 💻 Exemplo de Uso
+## Exemplo de Uso
 
 ```java
 // Buscar palavras do banco
@@ -70,7 +70,7 @@ while (iterator.hasNext()) {
 }
 ```
 
-## 🚀 Como Testar
+## Como Testar
 
 ### 1. Iniciar o Backend
 ```bash
@@ -87,14 +87,14 @@ curl http://localhost:8080/api/vocabulary/words/iterate/category/1
 curl http://localhost:8080/api/vocabulary/words/iterate/cefr/A1
 ```
 
-## ✨ Benefícios
+## Benefícios
 
 - **Encapsulamento**: A lógica de iteração fica separada da coleção
 - **Uniformidade**: Interface consistente para percorrer coleções
 - **Múltiplos Iteradores**: Vários iteradores simultâneos na mesma coleção
 - **Responsabilidade Única**: Cada classe tem uma responsabilidade específica
 
-## 📚 Referência
+## Referência
 
 **Design Patterns: Elements of Reusable Object-Oriented Software** (GoF)
 
