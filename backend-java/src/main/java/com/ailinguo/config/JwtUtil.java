@@ -15,11 +15,27 @@ import java.util.Map;
 @Component
 public class JwtUtil {
     
+    // Atributo estático privado para guardar a ÚNICA instância da classe
+    private static JwtUtil instancia;
+    
     @Value("${app.jwt.secret}")
     private String secret;
     
     @Value("${app.jwt.expiration}")
     private long expiration;
+    
+    // Construtor PRIVADO: impede a criação de instâncias com 'new JwtUtil()' de fora da classe
+    private JwtUtil() {
+        System.out.println("🔐 Instância ÚNICA do JwtUtil criada! (Singleton) 🔐");
+    }
+    
+    // Método estático público para obter a instância única
+    public static synchronized JwtUtil getInstance() {
+        if (instancia == null) {
+            instancia = new JwtUtil();
+        }
+        return instancia;
+    }
     
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
