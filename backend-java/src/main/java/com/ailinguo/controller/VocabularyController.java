@@ -1,5 +1,7 @@
 package com.ailinguo.controller;
 
+import com.ailinguo.iterator.IIterator;
+import com.ailinguo.iterator.VocabularyWordCollection;
 import com.ailinguo.model.VocabularyCategory;
 import com.ailinguo.model.VocabularyWord;
 import com.ailinguo.model.UserVocabularyProgress;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,5 +166,83 @@ public class VocabularyController {
     public ResponseEntity<List<UserVocabularyProgress>> getMasteredWords(@PathVariable Long userId) {
         List<UserVocabularyProgress> mastered = progressRepository.findMasteredByUserId(userId);
         return ResponseEntity.ok(mastered);
+    }
+
+    /**
+     * Exemplo de uso do padrão Iterator GoF
+     * Retorna palavras iteradas com informações adicionais
+     */
+    @GetMapping("/words/iterate/category/{categoryId}")
+    public ResponseEntity<Map<String, Object>> iterateWordsByCategory(@PathVariable Long categoryId) {
+        try {
+            // Busca as palavras da categoria
+            List<VocabularyWord> words = vocabularyWordRepository.findByCategoryId(categoryId);
+            
+            // Cria a coleção usando o padrão Iterator
+            VocabularyWordCollection collection = new VocabularyWordCollection(words);
+            
+            // Cria o iterator
+            IIterator iterator = collection.createIterator();
+            
+            // Itera sobre as palavras coletando informações
+            List<Map<String, Object>> wordDetails = new ArrayList<>();
+            int position = 1;
+            
+            while (iterator.hasNext()) {
+                VocabularyWord word = (VocabularyWord) iterator.next();
+                
+                Map<String, Object> detail = new HashMap<>();
+                detail.put("position", position++);
+                detail.put("id", word.getId());
+                detail.put("english", word.getEnglishWord());
+                detail.put("portuguese", word.getPortugueseTranslation());
+                detail.put("difficulty", word.getDifficulty());
+                detail.put("cefrLevel", word.getCefrLevel());
+                detail.put("xpReward", word.getXpReward());
+                
+                wordDetails.add(detail);
+            }
+            
+            // Prepara a resposta
+            Map<String, Object> response = new HashMap<>();
+            response.put("totalWords", collection.size());
+            response.put("categoryId", categoryId);
+            response.put("words", wordDetails);
+            response.put("iteratorPattern", "GoF Iterator Pattern implemented");
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    @GetMapping("/words/iterate/cefr/{cefrLevel}")
+    public ResponseEntity<Map<String, Object>> iterateWordsByCefr(@PathVariable String cefrLevel) {
+        try {
+            List<VocabularyWord> words = vocabularyWordRepository.findByCefrLevel(cefrLevel);
+            VocabularyWordCollection collection = new VocabularyWordCollection(words);
+            IIterator iterator = collection.createIterator();
+            
+            List<String> wordList = new ArrayList<>();
+            while (iterator.hasNext()) {
+                VocabularyWord word = (VocabularyWord) iterator.next();
+                wordList.add(word.getEnglishWord() + " - " + word.getPortugueseTranslation());
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("cefrLevel", cefrLevel);
+            response.put("totalWords", collection.size());
+            response.put("words", wordList);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
     }
 }
