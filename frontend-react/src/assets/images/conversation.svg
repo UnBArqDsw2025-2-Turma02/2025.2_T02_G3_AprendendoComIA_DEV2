@@ -1,0 +1,37 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="conversationGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="35" fill="url(#conversationGradient)"/>
+  
+  <!-- Chat bubbles -->
+  <g transform="translate(20, 25)">
+    <!-- First bubble -->
+    <ellipse cx="15" cy="15" rx="12" ry="8" fill="white" opacity="0.9"/>
+    <path d="M8 20 L12 25 L6 22" fill="white" opacity="0.9"/>
+    <circle cx="12" cy="12" r="1.5" fill="#10b981"/>
+    <circle cx="18" cy="12" r="1.5" fill="#10b981"/>
+    <path d="M10 16 Q15 18 20 16" stroke="#10b981" stroke-width="1.5" fill="none"/>
+  </g>
+  
+  <!-- Second bubble -->
+  <g transform="translate(35, 35)">
+    <ellipse cx="15" cy="15" rx="12" ry="8" fill="white" opacity="0.9"/>
+    <path d="M22 20 L18 25 L24 22" fill="white" opacity="0.9"/>
+    <circle cx="12" cy="12" r="1.5" fill="#10b981"/>
+    <circle cx="18" cy="12" r="1.5" fill="#10b981"/>
+    <path d="M10 16 Q15 18 20 16" stroke="#10b981" stroke-width="1.5" fill="none"/>
+  </g>
+  
+  <!-- Microphone -->
+  <g transform="translate(50, 20)">
+    <rect x="0" y="8" width="3" height="12" rx="1.5" fill="white"/>
+    <ellipse cx="1.5" cy="6" rx="4" ry="3" fill="white"/>
+    <path d="M-2 4 L2 4" stroke="white" stroke-width="1"/>
+  </g>
+</svg>

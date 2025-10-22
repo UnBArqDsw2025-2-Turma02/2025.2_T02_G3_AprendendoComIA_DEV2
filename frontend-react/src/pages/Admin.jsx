@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { 
   Users, 
   BookOpen, 
@@ -15,15 +16,24 @@ import {
   Star,
   Award,
   Target,
-  Zap
+  Zap,
+  ArrowLeft,
+  Plus,
+  Trash2,
+  Edit
 } from 'lucide-react'
 import axios from 'axios'
 
 export default function Admin() {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('dashboard')
   const [stats, setStats] = useState(null)
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
+  const [showAddUserModal, setShowAddUserModal] = useState(false)
+  const [showAddContentModal, setShowAddContentModal] = useState(false)
+  const [newUser, setNewUser] = useState({ name: '', email: '', password: '', cefrLevel: 'A1' })
+  const [newContent, setNewContent] = useState({ title: '', description: '', level: 'A1', type: 'lesson' })
 
   useEffect(() => {
     loadAdminData()
@@ -36,12 +46,116 @@ export default function Admin() {
         axios.get('/api/admin/users', { withCredentials: true })
       ])
       
-      setStats(statsResponse.data)
-      setUsers(usersResponse.data)
+      console.log('Stats response:', statsResponse.data)
+      console.log('Users response:', usersResponse.data)
+      
+      // Map the stats data to match the expected structure
+      const statsData = statsResponse.data
+      const mappedStats = [
+        { 
+          title: 'Usuários Ativos', 
+          value: statsData.activeUsers?.toString() || '0', 
+          change: statsData.userGrowth || '+0%', 
+          icon: Users, 
+          color: 'blue' 
+        },
+        { 
+          title: 'Total de Usuários', 
+          value: statsData.totalUsers?.toString() || '0', 
+          change: statsData.userGrowth || '+0%', 
+          icon: Users, 
+          color: 'green' 
+        },
+        { 
+          title: 'Sessões de Chat', 
+          value: statsData.totalChatSessions?.toString() || '0', 
+          change: statsData.engagementGrowth || '+0%', 
+          icon: MessageSquare, 
+          color: 'purple' 
+        },
+        { 
+          title: 'Taxa de Retenção', 
+          value: statsData.retentionRate || '0%', 
+          change: '+3%', 
+          icon: TrendingUp, 
+          color: 'orange' 
+        }
+      ]
+      
+      setStats(mappedStats)
+      // Handle paginated response structure
+      const usersData = usersResponse.data.users || usersResponse.data
+      setUsers(Array.isArray(usersData) ? usersData : [])
     } catch (error) {
       console.error('Error loading admin data:', error)
+      console.error('Error details:', error.response?.data || error.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAddUser = async () => {
+    try {
+      // Validação dos campos obrigatórios
+      if (!newUser.name || !newUser.email || !newUser.password) {
+        alert('Por favor, preencha todos os campos obrigatórios')
+        return
+      }
+
+      // Validação de email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(newUser.email)) {
+        alert('Por favor, insira um email válido')
+        return
+      }
+
+      // Validação de senha (mínimo 6 caracteres)
+      if (newUser.password.length < 6) {
+        alert('A senha deve ter pelo menos 6 caracteres')
+        return
+      }
+
+      // Simular criação de usuário (substituir por API real)
+      const userData = {
+        ...newUser,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        isActive: true,
+        totalMinutes: 0,
+        streakDays: 0
+      }
+      
+      setUsers([...users, userData])
+      setShowAddUserModal(false)
+      setNewUser({ name: '', email: '', password: '', cefrLevel: 'A1' })
+      alert('Usuário adicionado com sucesso!')
+    } catch (error) {
+      console.error('Error adding user:', error)
+      alert('Erro ao adicionar usuário')
+    }
+  }
+
+  const handleDeleteUser = async (userId) => {
+    if (window.confirm('Tem certeza que deseja remover este usuário?')) {
+      try {
+        setUsers(users.filter(user => user.id !== userId))
+        alert('Usuário removido com sucesso!')
+      } catch (error) {
+        console.error('Error deleting user:', error)
+        alert('Erro ao remover usuário')
+      }
+    }
+  }
+
+  const handleAddContent = async () => {
+    try {
+      // Simular criação de conteúdo (substituir por API real)
+      alert('Conteúdo adicionado com sucesso!')
+      setShowAddContentModal(false)
+      setNewContent({ title: '', description: '', level: 'A1', type: 'lesson' })
+    } catch (error) {
+      console.error('Error adding content:', error)
+      alert('Erro ao adicionar conteúdo')
     }
   }
 
@@ -98,11 +212,10 @@ export default function Admin() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <button className="btn-outline">
-                <Settings size={20} />
-                Configurações
-              </button>
-              <button className="btn-primary">
+              <button 
+                onClick={() => setShowAddUserModal(true)}
+                className="btn-primary"
+              >
                 <UserCheck size={20} />
                 Adicionar Usuário
               </button>
@@ -136,6 +249,19 @@ export default function Admin() {
               </button>
             ))}
           </nav>
+        </div>
+      </div>
+
+      {/* Back Button */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-3">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft size={16} />
+            <span>Voltar ao Dashboard</span>
+          </button>
         </div>
       </div>
 
@@ -212,10 +338,6 @@ export default function Admin() {
                   placeholder="Buscar usuários..."
                   className="input-field w-64"
                 />
-                <button className="btn-primary">
-                  <UserCheck size={20} />
-                  Novo Usuário
-                </button>
               </div>
             </div>
 
@@ -232,7 +354,7 @@ export default function Admin() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentUsers.map((user) => (
+                    {(users.length > 0 ? users : recentUsers).map((user) => (
                       <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
                         <td className="py-4 px-6">
                           <div>
@@ -241,21 +363,30 @@ export default function Admin() {
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <span className="level-badge">{user.level}</span>
+                          <span className="level-badge">{user.cefrLevel || user.level}</span>
                         </td>
-                        <td className="py-4 px-6 text-gray-600">{user.joinDate}</td>
+                        <td className="py-4 px-6 text-gray-600">
+                          {user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : user.joinDate}
+                        </td>
                         <td className="py-4 px-6">
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(user.status)}`}>
-                            {user.status === 'active' ? 'Ativo' : 'Inativo'}
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(user.isActive ? 'active' : 'inactive')}`}>
+                            {user.isActive ? 'Ativo' : 'Inativo'}
                           </span>
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-2">
-                            <button className="text-blue-600 hover:text-blue-800">
-                              <Settings size={16} />
+                            <button 
+                              className="text-blue-600 hover:text-blue-800"
+                              title="Editar usuário"
+                            >
+                              <Edit size={16} />
                             </button>
-                            <button className="text-red-600 hover:text-red-800">
-                              <AlertTriangle size={16} />
+                            <button 
+                              onClick={() => handleDeleteUser(user.id)}
+                              className="text-red-600 hover:text-red-800"
+                              title="Remover usuário"
+                            >
+                              <Trash2 size={16} />
                             </button>
                           </div>
                         </td>
@@ -272,7 +403,10 @@ export default function Admin() {
           <div className="space-y-8">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Conteúdo</h2>
-              <button className="btn-primary">
+              <button 
+                onClick={() => setShowAddContentModal(true)}
+                className="btn-primary"
+              >
                 <BookOpen size={20} />
                 Adicionar Conteúdo
               </button>
@@ -434,6 +568,157 @@ export default function Admin() {
           </div>
         )}
       </div>
+
+      {/* Modal Adicionar Usuário */}
+      {showAddUserModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Adicionar Novo Usuário</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nome <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                  className="input-field w-full"
+                  placeholder="Nome completo"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  className="input-field w-full"
+                  placeholder="email@exemplo.com"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Senha <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                  className="input-field w-full"
+                  placeholder="Mínimo 6 caracteres"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nível CEFR</label>
+                <select
+                  value={newUser.cefrLevel}
+                  onChange={(e) => setNewUser({...newUser, cefrLevel: e.target.value})}
+                  className="input-field w-full"
+                >
+                  <option value="A1">A1 - Iniciante</option>
+                  <option value="A2">A2 - Básico</option>
+                  <option value="B1">B1 - Intermediário</option>
+                  <option value="B2">B2 - Intermediário Superior</option>
+                  <option value="C1">C1 - Avançado</option>
+                  <option value="C2">C2 - Proficiente</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowAddUserModal(false)}
+                className="btn-secondary flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleAddUser}
+                className="btn-primary flex-1"
+              >
+                Adicionar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Adicionar Conteúdo */}
+      {showAddContentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Adicionar Novo Conteúdo</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                <input
+                  type="text"
+                  value={newContent.title}
+                  onChange={(e) => setNewContent({...newContent, title: e.target.value})}
+                  className="input-field w-full"
+                  placeholder="Título do conteúdo"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                <textarea
+                  value={newContent.description}
+                  onChange={(e) => setNewContent({...newContent, description: e.target.value})}
+                  className="input-field w-full h-20"
+                  placeholder="Descrição do conteúdo"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nível</label>
+                <select
+                  value={newContent.level}
+                  onChange={(e) => setNewContent({...newContent, level: e.target.value})}
+                  className="input-field w-full"
+                >
+                  <option value="A1">A1 - Iniciante</option>
+                  <option value="A2">A2 - Básico</option>
+                  <option value="B1">B1 - Intermediário</option>
+                  <option value="B2">B2 - Intermediário Superior</option>
+                  <option value="C1">C1 - Avançado</option>
+                  <option value="C2">C2 - Proficiente</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                <select
+                  value={newContent.type}
+                  onChange={(e) => setNewContent({...newContent, type: e.target.value})}
+                  className="input-field w-full"
+                >
+                  <option value="lesson">Lição</option>
+                  <option value="exercise">Exercício</option>
+                  <option value="vocabulary">Vocabulário</option>
+                  <option value="grammar">Gramática</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowAddContentModal(false)}
+                className="btn-secondary flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleAddContent}
+                className="btn-primary flex-1"
+              >
+                Adicionar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

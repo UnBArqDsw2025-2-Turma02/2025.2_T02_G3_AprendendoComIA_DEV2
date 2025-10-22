@@ -1,0 +1,37 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="streakGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f97316;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ea580c;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="35" fill="url(#streakGradient)"/>
+  
+  <!-- Fire/flame -->
+  <g transform="translate(25, 20)">
+    <!-- Main flame -->
+    <path d="M15 40 Q20 10 25 40 Q20 30 15 40" fill="white" opacity="0.9"/>
+    
+    <!-- Inner flame -->
+    <path d="M17 35 Q20 20 23 35 Q20 28 17 35" fill="#fbbf24" opacity="0.8"/>
+    
+    <!-- Flame tips -->
+    <path d="M12 45 Q15 35 18 45" stroke="white" stroke-width="2" fill="none" opacity="0.7"/>
+    <path d="M22 45 Q25 35 28 45" stroke="white" stroke-width="2" fill="none" opacity="0.7"/>
+  </g>
+  
+  <!-- Sparkles around fire -->
+  <g transform="translate(15, 15)">
+    <path d="M0 -2 L1 0 L0 2 L-1 0 Z" fill="white" opacity="0.8"/>
+  </g>
+  
+  <g transform="translate(60, 20)">
+    <path d="M0 -2 L1 0 L0 2 L-1 0 Z" fill="white" opacity="0.8"/>
+  </g>
+  
+  <g transform="translate(20, 60)">
+    <path d="M0 -2 L1 0 L0 2 L-1 0 Z" fill="white" opacity="0.8"/>
+  </g>
+</svg>

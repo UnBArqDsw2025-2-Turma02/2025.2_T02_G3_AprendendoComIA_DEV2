@@ -1,0 +1,22 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="levelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="35" fill="url(#levelGradient)"/>
+  
+  <!-- Star -->
+  <g transform="translate(40, 40)">
+    <path d="M0 -15 L4 -4 L15 -4 L6 2 L9 13 L0 8 L-9 13 L-6 2 L-15 -4 L-4 -4 Z" fill="white" opacity="0.9"/>
+  </g>
+  
+  <!-- Level indicator -->
+  <g transform="translate(40, 55)">
+    <rect x="-8" y="-3" width="16" height="6" rx="3" fill="white" opacity="0.8"/>
+    <text x="0" y="2" text-anchor="middle" fill="#8b5cf6" font-family="Arial" font-size="8" font-weight="bold">LVL</text>
+  </g>
+</svg>

@@ -47,10 +47,9 @@ public class DashboardService {
         long chatSessions = chatSessionRepository.countByUserId(userId);
         long chatTurns = chatTurnRepository.countByUserId(userId);
         
-        // Calcular XP baseado em atividades
-        long xpFromVocabulary = userReviews * 10; // 10 XP por revisão
-        long xpFromChat = chatTurns * 5; // 5 XP por turno de chat
-        long totalXp = xpFromVocabulary + xpFromChat;
+        // Use real XP from database
+        Integer totalXp = user.getTotalXp() != null ? user.getTotalXp() : 0;
+        Integer level = user.getLevel() != null ? user.getLevel() : 1;
         
         // Calcular streak (dias consecutivos com atividade)
         long streak = calculateStreak(userId);
@@ -64,13 +63,14 @@ public class DashboardService {
         Map<String, Object> stats = new HashMap<>();
         stats.put("streakDays", streak);
         stats.put("totalXp", totalXp);
-        stats.put("dailyGoalMinutes", user.getDailyGoalMinutes());
+        stats.put("level", level);
+        stats.put("dailyGoalMinutes", user.getDailyGoalMinutes() != null ? user.getDailyGoalMinutes() : 15);
         stats.put("todayMinutes", todayMinutes);
-        stats.put("cefrLevel", user.getCefrLevel().toString());
+        stats.put("cefrLevel", user.getCefrLevel() != null ? user.getCefrLevel().toString() : "A1");
         stats.put("totalReviews", userReviews);
         stats.put("totalChatSessions", chatSessions);
         stats.put("totalVocabularyCards", totalVocabularyCards);
-        stats.put("progressPercentage", Math.min(100, (todayMinutes * 100) / user.getDailyGoalMinutes()));
+        stats.put("progressPercentage", Math.min(100, (todayMinutes * 100) / (user.getDailyGoalMinutes() != null ? user.getDailyGoalMinutes() : 15)));
         
         return stats;
     }

@@ -39,6 +39,8 @@ public class User {
     private Integer dailyGoalMinutes;
     private Integer streakDays;
     private Integer totalMinutes;
+    private Integer totalXp = 0;
+    private Integer level = 1;
     
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -77,6 +79,12 @@ public class User {
     
     public Integer getTotalMinutes() { return totalMinutes; }
     public void setTotalMinutes(Integer totalMinutes) { this.totalMinutes = totalMinutes; }
+    
+    public Integer getTotalXp() { return totalXp; }
+    public void setTotalXp(Integer totalXp) { this.totalXp = totalXp; }
+    
+    public Integer getLevel() { return level; }
+    public void setLevel(Integer level) { this.level = level; }
     
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
@@ -126,6 +134,8 @@ public class User {
         private Integer dailyGoalMinutes;
         private Integer streakDays;
         private Integer totalMinutes;
+        private Integer totalXp;
+        private Integer level;
         private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
         private LocalDateTime lastStudyDate;
@@ -141,6 +151,8 @@ public class User {
         public UserBuilder dailyGoalMinutes(Integer dailyGoalMinutes) { this.dailyGoalMinutes = dailyGoalMinutes; return this; }
         public UserBuilder streakDays(Integer streakDays) { this.streakDays = streakDays; return this; }
         public UserBuilder totalMinutes(Integer totalMinutes) { this.totalMinutes = totalMinutes; return this; }
+        public UserBuilder totalXp(Integer totalXp) { this.totalXp = totalXp; return this; }
+        public UserBuilder level(Integer level) { this.level = level; return this; }
         public UserBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
         public UserBuilder updatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; return this; }
         public UserBuilder lastStudyDate(LocalDateTime lastStudyDate) { this.lastStudyDate = lastStudyDate; return this; }
@@ -158,6 +170,8 @@ public class User {
             user.setDailyGoalMinutes(dailyGoalMinutes);
             user.setStreakDays(streakDays);
             user.setTotalMinutes(totalMinutes);
+            user.setTotalXp(totalXp);
+            user.setLevel(level);
             user.setCreatedAt(createdAt);
             user.setUpdatedAt(updatedAt);
             user.setLastStudyDate(lastStudyDate);

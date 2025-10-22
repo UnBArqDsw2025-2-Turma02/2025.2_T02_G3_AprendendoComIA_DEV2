@@ -186,7 +186,7 @@ export default function Chat() {
                           </div>
                           <p className="font-semibold text-lg mb-4">{msg.exercise.question}</p>
                           <div className="space-y-2">
-                            {msg.exercise.options.map((opt, i) => (
+                            {msg.exercise.options?.map((opt, i) => (
                               <div key={i} className={`p-3 rounded-xl text-lg ${
                                 i === msg.exercise.correct 
                                   ? 'bg-green-100 text-green-800 border-2 border-green-300' 

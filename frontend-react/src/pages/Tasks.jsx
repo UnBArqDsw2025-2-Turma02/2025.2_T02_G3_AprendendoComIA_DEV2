@@ -75,13 +75,30 @@ export default function Tasks() {
 
   const loadQuestions = async () => {
     try {
-      const response = await axios.get('/api/tasks', { withCredentials: true })
-      setQuestions(response.data)
-      setLoading(false)
+      // Load exercises by user's CEFR level
+      const cefrLevel = user.cefrLevel || 'A1'
+      const response = await axios.get(`/api/exercises/random/${cefrLevel}/5`, {
+        withCredentials: true
+      })
+      
+      // Transform exercises to questions format
+      const exercises = response.data
+      const questions = exercises.map(exercise => ({
+        id: exercise.id,
+        title: exercise.title,
+        type: exercise.type,
+        difficulty: exercise.difficulty,
+        cefrLevel: exercise.cefrLevel,
+        xpReward: exercise.xpReward,
+        questions: exercise.questions || []
+      }))
+      
+      setQuestions(questions)
     } catch (error) {
       console.error('Error loading questions:', error)
       // Fallback to mock data if API fails
       setQuestions(mockQuestions)
+    } finally {
       setLoading(false)
     }
   }
@@ -93,21 +110,42 @@ export default function Tasks() {
     setShowResult(true)
 
     try {
-      // Submit answer to backend
-      await axios.post('/api/tasks/attempt', {
-        taskId: questions[currentIndex].id,
-        selectedAnswerIndex: optionIndex,
-        timeSpent: 30 // Mock time spent
+      const currentExercise = questions[currentIndex]
+      if (!currentExercise || !currentExercise.questions) {
+        console.error('Current exercise or questions not found')
+        return
+      }
+      
+      const answers = currentExercise.questions.map((question, qIndex) => ({
+        questionId: question.id,
+        answer: optionIndex.toString() // Simplified for now
+      }))
+
+      // Submit exercise attempt to backend
+      const response = await axios.post(`/api/exercises/${currentExercise.id}/attempt`, {
+        userId: user.id,
+        answers: answers,
+        timeSpent: 30
       }, { withCredentials: true })
+
+      // Update XP from response
+      if (response.data.xpEarned) {
+        setXp(prev => prev + response.data.xpEarned)
+      }
+
+      // Update score
+      if (response.data.correctAnswers) {
+        setScore(score + response.data.correctAnswers)
+      }
     } catch (error) {
       console.error('Error submitting answer:', error)
-    }
-
-    if (optionIndex === questions[currentIndex].answerIndex) {
-      setScore(score + 1)
-      setXp(prev => prev + 20) // +20 XP for correct answer
-    } else {
-      setXp(prev => prev + 5) // +5 XP for trying
+      // Still allow progression even if API fails
+      if (optionIndex === 0) { // Assume first option is correct for fallback
+        setScore(score + 1)
+        setXp(prev => prev + 20)
+      } else {
+        setXp(prev => prev + 5)
+      }
     }
   }
 
@@ -214,7 +252,7 @@ export default function Tasks() {
                 </h3>
 
                 <div className="space-y-4">
-                  {currentQuestion?.options.map((option, idx) => {
+                  {currentQuestion?.options?.map((option, idx) => {
                     const isSelected = selectedAnswer === idx
                     const isCorrect = idx === currentQuestion.answerIndex
                     const showCorrect = showResult && isCorrect

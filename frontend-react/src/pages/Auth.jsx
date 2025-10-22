@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { Mail, Lock, User, GraduationCap, Brain, Eye, EyeOff, CheckCircle, Star, Zap, Flame } from 'lucide-react'
+import { Mail, Lock, User, GraduationCap, Brain, Eye, EyeOff, CheckCircle, Star, Zap, Flame, ArrowRight, Sparkles, Shield, Globe, Award, TrendingUp } from 'lucide-react'
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true)
-  const [email, setEmail] = useState('admin@lingu.com')
-  const [password, setPassword] = useState('admin123')
+  const [email, setEmail] = useState('demo@lingu.com')
+  const [password, setPassword] = useState('demo12345')
   const [name, setName] = useState('')
   const [cefrLevel, setCefrLevel] = useState('A2')
   const [error, setError] = useState('')
@@ -23,259 +23,233 @@ export default function Auth() {
 
     try {
       if (isLogin) {
-        await login(email, password)
+        const result = await login(email, password)
+        console.log('Login successful:', result)
+        navigate('/dashboard')
       } else {
-        await register(email, name, password, cefrLevel)
+        const result = await register(email, name, password, cefrLevel)
+        console.log('Registration successful:', result)
+        navigate('/dashboard')
       }
-      navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.error || 'Erro ao autenticar. Tente novamente.')
+      console.error('Auth error:', err)
+      setError(err.message || 'Erro ao fazer login/registro')
     } finally {
       setLoading(false)
     }
   }
 
   const features = [
-    { icon: Brain, text: "Tutor IA Avançado" },
-    { icon: Zap, text: "Correções em Tempo Real" },
-    { icon: Flame, text: "Gamificação" },
-    { icon: Star, text: "Progresso Personalizado" }
+    { icon: Brain, text: "IA Avançada", color: "from-blue-500 to-cyan-500" },
+    { icon: Zap, text: "Aprendizado Rápido", color: "from-blue-600 to-blue-800" },
+    { icon: Award, text: "Gamificação", color: "from-cyan-500 to-blue-500" },
+    { icon: Shield, text: "100% Seguro", color: "from-blue-700 to-blue-900" }
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-4">
-      <div className="max-w-6xl w-full grid lg:grid-cols-2 gap-12 items-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-blue-800 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-cyan-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-blue-600 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{animationDelay: '4s'}}></div>
+      </div>
+
+      <div className="relative z-10 min-h-screen flex">
         {/* Left Side - Features */}
-        <div className="hidden lg:block">
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
-                <Brain className="text-white" size={28} />
-              </div>
-              <h1 className="text-4xl font-bold text-gradient">Linguo</h1>
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Aprenda Inglês de{' '}
-              <span className="text-gradient">Forma Divertida</span>
-            </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Seu companheiro de estudos disponível 24/7. Aprenda com conversação, 
-              exercícios personalizados e acompanhe seu progresso de forma gamificada.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon
-              return (
-                <div key={index} className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
-                    <Icon className="text-white" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-900">{feature.text}</h3>
-                    <p className="text-gray-600">
-                      {index === 0 && "Conversação natural com correções inteligentes"}
-                      {index === 1 && "Feedback instantâneo para melhorar rapidamente"}
-                      {index === 2 && "Metas, streaks e ranking para manter a motivação"}
-                      {index === 3 && "Acompanhe sua evolução com dados precisos"}
-                    </p>
-                  </div>
+        <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12">
+          <div className="max-w-md">
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20">
+                  <Brain className="w-8 h-8 text-white" />
                 </div>
-              )
-            })}
-          </div>
-
-          <div className="mt-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-3xl p-8 text-white">
-            <h3 className="text-2xl font-bold mb-4">Junte-se a mais de 1 milhão de estudantes!</h3>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold">1M+</div>
-                <div className="text-sm opacity-90">Estudantes Ativos</div>
+                <span className="text-3xl font-bold text-white">AI Linguo</span>
               </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold">95%</div>
-                <div className="text-sm opacity-90">Taxa de Satisfação</div>
+              <h1 className="text-5xl font-black text-white mb-6 leading-tight">
+                Domine o <span className="bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">Inglês</span> com IA
+              </h1>
+              <p className="text-xl text-white/80 leading-relaxed">
+                A plataforma mais avançada para aprender inglês. Conversas reais, correções instantâneas e gamificação que te mantém motivado.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {features.map((feature, index) => (
+                <div key={index} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 hover:bg-white/20 transition-all duration-300">
+                  <div className={`w-12 h-12 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center mb-3`}>
+                    <feature.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-white font-semibold">{feature.text}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 flex items-center gap-4 text-white/70">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span>10K+ Estudantes</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-400" />
+                <span>4.9★ Avaliação</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right Side - Auth Form */}
-        <div className="w-full max-w-md mx-auto">
-          <div className="text-center mb-8 lg:hidden">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
-                <Brain className="text-white" size={24} />
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-4 py-12">
+          <div className="w-full max-w-md">
+            {/* Mobile Logo */}
+            <div className="lg:hidden flex items-center gap-3 mb-8 justify-center">
+              <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20">
+                <Brain className="w-8 h-8 text-white" />
               </div>
-              <h1 className="text-3xl font-bold text-gradient">Linguo</h1>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                {isLogin ? 'Bem-vindo de volta!' : 'Crie sua conta'}
-              </h2>
-              <p className="text-gray-600">
-                {isLogin ? 'Entre na sua conta para continuar aprendendo' : 'Comece sua jornada de aprendizado'}
-              </p>
+              <span className="text-2xl font-bold text-white">AI Linguo</span>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <User size={16} className="inline mr-2" />
-                    Nome Completo
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="input-field"
-                    required
-                    minLength={2}
-                    placeholder="Digite seu nome completo"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <Mail size={16} className="inline mr-2" />
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input-field"
-                  required
-                  placeholder="seu@email.com"
-                />
+            {/* Auth Card */}
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-2xl">
+              {/* Toggle Buttons */}
+              <div className="flex bg-white/5 rounded-2xl p-1 mb-8">
+                <button
+                  onClick={() => setIsLogin(true)}
+                  className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
+                    isLogin 
+                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  Entrar
+                </button>
+                <button
+                  onClick={() => setIsLogin(false)}
+                  className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
+                    !isLogin 
+                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg' 
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  Criar Conta
+                </button>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <Lock size={16} className="inline mr-2" />
-                  Senha
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="input-field pr-12"
-                    required
-                    minLength={8}
-                    placeholder="Mínimo 8 caracteres"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <GraduationCap size={16} className="inline mr-2" />
-                    Nível de Inglês (CEFR)
-                  </label>
-                  <select
-                    value={cefrLevel}
-                    onChange={(e) => setCefrLevel(e.target.value)}
-                    className="input-field"
-                  >
-                    <option value="A1">A1 - Iniciante</option>
-                    <option value="A2">A2 - Básico</option>
-                    <option value="B1">B1 - Intermediário</option>
-                    <option value="B2">B2 - Intermediário-Avançado</option>
-                    <option value="C1">C1 - Avançado</option>
-                  </select>
-                </div>
-              )}
-
-              {error && (
-                <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-2xl text-sm flex items-center gap-2">
-                  <div className="w-5 h-5 bg-red-200 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-red-600 text-xs">!</span>
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {!isLogin && (
+                  <div>
+                    <label className="block text-white/80 font-semibold mb-2">Nome Completo</label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                        placeholder="Seu nome completo"
+                        required={!isLogin}
+                      />
+                    </div>
                   </div>
-                  {error}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full btn-primary text-lg py-4"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
-                    Carregando...
-                  </div>
-                ) : (
-                  isLogin ? 'Entrar' : 'Criar Conta'
                 )}
-              </button>
-            </form>
 
-            <div className="mt-8 text-center">
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-blue-600 hover:text-blue-700 font-semibold transition-colors"
-              >
-                {isLogin ? 'Não tem conta? Criar conta' : 'Já tem conta? Fazer login'}
-              </button>
+                <div>
+                  <label className="block text-white/80 font-semibold mb-2">Email</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                      placeholder="seu@email.com"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-white/80 font-semibold mb-2">Senha</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-12 pr-12 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                      placeholder="Sua senha"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
+
+                {!isLogin && (
+                  <div>
+                    <label className="block text-white/80 font-semibold mb-2">Nível de Inglês</label>
+                    <div className="relative">
+                      <GraduationCap className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" />
+                      <select
+                        value={cefrLevel}
+                        onChange={(e) => setCefrLevel(e.target.value)}
+                        className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300 appearance-none"
+                        required={!isLogin}
+                      >
+                        <option value="A1" className="bg-gray-800">A1 - Iniciante</option>
+                        <option value="A2" className="bg-gray-800">A2 - Básico</option>
+                        <option value="B1" className="bg-gray-800">B1 - Intermediário</option>
+                        <option value="B2" className="bg-gray-800">B2 - Intermediário Avançado</option>
+                        <option value="C1" className="bg-gray-800">C1 - Avançado</option>
+                        <option value="C2" className="bg-gray-800">C2 - Fluente</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
+                {error && (
+                  <div className="bg-red-500/20 border border-red-500/30 rounded-2xl p-4 text-red-200 text-center">
+                    {error}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white font-bold text-lg py-4 rounded-2xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3"
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-3">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                      Carregando...
+                    </div>
+                  ) : (
+                    <>
+                      {isLogin ? 'Entrar' : 'Criar Conta'}
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Demo Credentials */}
+              <div className="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10">
+                <div className="text-white/70 text-sm text-center mb-2">Credenciais de Demo:</div>
+                <div className="text-white/50 text-xs text-center">
+                  Email: demo@lingu.com<br />
+                  Senha: demo12345
+                </div>
+              </div>
             </div>
-
-            {/* Test Credentials */}
-            {isLogin && (
-              <div className="mt-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-2xl">
-                <h3 className="font-bold text-blue-800 mb-2">🔑 Credenciais de Teste</h3>
-                <div className="text-sm text-blue-700 space-y-1">
-                  <div><strong>Admin:</strong> admin@lingu.com / admin123</div>
-                  <div><strong>Usuário:</strong> test@lingu.com / admin123</div>
-                </div>
-              </div>
-            )}
-
-            {/* Benefits */}
-            {!isLogin && (
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="text-center mb-4">
-                  <span className="text-sm text-gray-600">Ao criar uma conta, você ganha:</span>
-                </div>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle size={16} />
-                    <span>Acesso gratuito</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle size={16} />
-                    <span>Tutor IA 24/7</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle size={16} />
-                    <span>Progresso salvo</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-green-600">
-                    <CheckCircle size={16} />
-                    <span>Sem anúncios</span>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
     </div>
   )
 }
-

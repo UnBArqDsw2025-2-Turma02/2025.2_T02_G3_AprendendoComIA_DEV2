@@ -1,0 +1,43 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gamificationGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="35" fill="url(#gamificationGradient)"/>
+  
+  <!-- Trophy -->
+  <g transform="translate(30, 15)">
+    <!-- Trophy base -->
+    <rect x="10" y="35" width="20" height="8" rx="4" fill="white" opacity="0.9"/>
+    <rect x="12" y="30" width="16" height="8" rx="2" fill="white" opacity="0.9"/>
+    
+    <!-- Trophy cup -->
+    <path d="M15 10 Q20 5 25 10 L25 30 Q20 35 15 30 Z" fill="white" opacity="0.9"/>
+    
+    <!-- Trophy handles -->
+    <path d="M15 15 Q10 20 15 25" stroke="white" stroke-width="2" fill="none" opacity="0.9"/>
+    <path d="M25 15 Q30 20 25 25" stroke="white" stroke-width="2" fill="none" opacity="0.9"/>
+    
+    <!-- Star on trophy -->
+    <g transform="translate(20, 20)">
+      <path d="M0 -8 L2 -2 L8 -2 L3 2 L5 8 L0 5 L-5 8 L-3 2 L-8 -2 L-2 -2 Z" fill="#f59e0b"/>
+    </g>
+  </g>
+  
+  <!-- Floating stars -->
+  <g transform="translate(15, 20)">
+    <path d="M0 -3 L1 -1 L3 -1 L1 1 L2 3 L0 2 L-2 3 L-1 1 L-3 -1 L-1 -1 Z" fill="white" opacity="0.8"/>
+  </g>
+  
+  <g transform="translate(60, 25)">
+    <path d="M0 -3 L1 -1 L3 -1 L1 1 L2 3 L0 2 L-2 3 L-1 1 L-3 -1 L-1 -1 Z" fill="white" opacity="0.8"/>
+  </g>
+  
+  <g transform="translate(25, 55)">
+    <path d="M0 -3 L1 -1 L3 -1 L1 1 L2 3 L0 2 L-2 3 L-1 1 L-3 -1 L-1 -1 Z" fill="white" opacity="0.8"/>
+  </g>
+</svg>

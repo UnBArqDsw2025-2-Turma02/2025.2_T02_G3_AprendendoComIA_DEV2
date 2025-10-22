@@ -40,17 +40,56 @@ export default function Gamification() {
 
   const loadData = async () => {
     try {
-      const [leadersResponse, groupsResponse] = await Promise.all([
+      const [leadersResponse, groupsResponse, goalsResponse] = await Promise.all([
         axios.get('/api/gamification/leaderboard', { withCredentials: true }),
-        axios.get('/api/gamification/groups', { withCredentials: true })
+        axios.get('/api/gamification/groups', { withCredentials: true }),
+        axios.get(`/api/gamification/goals/${user.id}`, { withCredentials: true })
       ])
       
-      setLeaders(leadersResponse.data.leaders || leadersResponse.data)
-      setGroups(groupsResponse.data.groups || groupsResponse.data)
-      setGoals(mockGoals) // Keep mock goals for now
+      console.log('Leaders response:', leadersResponse.data)
+      console.log('Groups response:', groupsResponse.data)
+      console.log('Goals response:', goalsResponse.data)
+      
+      // Handle the response structure correctly
+      const leadersData = leadersResponse.data.leaderboard || leadersResponse.data
+      const groupsData = groupsResponse.data.groups || groupsResponse.data
+      const goalsData = goalsResponse.data.goals || goalsResponse.data
+      
+      // Ensure we have the right data structure
+      const processedLeaders = Array.isArray(leadersData) ? leadersData.map(leader => ({
+        id: leader.id,
+        name: leader.name,
+        email: leader.email,
+        xp: leader.xp || 0,
+        level: leader.level || 1,
+        streak: leader.streak || 0,
+        team: 'Brasil', // Default team
+        reactions: { clap: 0, fire: 0, flex: 0 } // Default reactions
+      })) : []
+      
+      // Process goals data
+      const processedGoals = Array.isArray(goalsData) ? goalsData.map(goal => ({
+        id: goal.id,
+        title: goal.title,
+        desc: goal.description,
+        progress: goal.progress || 0,
+        target: goal.target || 1,
+        unit: goal.unit || '',
+        icon: goal.icon || Target,
+        color: goal.color || 'blue',
+        completed: goal.completed || false
+      })) : mockGoals
+      
+      console.log('Processed leaders:', processedLeaders)
+      console.log('Processed goals:', processedGoals)
+      
+      setLeaders(processedLeaders)
+      setGroups(Array.isArray(groupsData) ? groupsData : [])
+      setGoals(processedGoals)
       setLoading(false)
     } catch (error) {
       console.error('Error loading gamification data:', error)
+      console.error('Error details:', error.response?.data || error.message)
       // Fallback to mock data
       setLeaders(mockLeaders)
       setGroups(mockGroups)
@@ -218,17 +257,17 @@ export default function Gamification() {
                     <div className="flex items-center gap-4 text-sm text-gray-600">
                       <span className="flex items-center gap-1">
                         <Users size={16} />
-                        {leader.team}
+                        {leader.team || 'Brasil'}
                       </span>
                       <span className="flex items-center gap-1">
                         <Flame className="streak-fire" size={16} />
-                        {leader.streak} dias
+                        {leader.streak || 0} dias
                       </span>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-green-600">{leader.xp.toLocaleString()} XP</div>
+                    <div className="text-2xl font-bold text-green-600">{(leader.xp || 0).toLocaleString()} XP</div>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <TrendingUp size={16} />
                       <span>+{Math.floor(Math.random() * 100)} esta semana</span>
@@ -236,7 +275,7 @@ export default function Gamification() {
                   </div>
 
                   <div className="flex gap-2">
-                    {Object.entries(leader.reactions).map(([emoji, count]) => (
+                    {Object.entries(leader.reactions || {}).map(([emoji, count]) => (
                       count > 0 && (
                         <button key={emoji} className="flex items-center gap-1 px-3 py-1 bg-white rounded-xl text-sm hover:bg-gray-50 transition-colors">
                           <span>{emoji === 'clap' ? '👏' : emoji === 'fire' ? '🔥' : emoji === 'flex' ? '💪' : '😂'}</span>

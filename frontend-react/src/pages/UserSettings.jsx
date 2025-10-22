@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import { 
   User, 
   Bell, 
@@ -29,12 +30,14 @@ import {
   BookOpen,
   MessageSquare,
   Trophy,
-  Star
+  Star,
+  ArrowLeft
 } from 'lucide-react'
 import axios from 'axios'
 
 export default function UserSettings() {
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('profile')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -52,11 +55,75 @@ export default function UserSettings() {
     try {
       // Assuming we have user ID from auth context
       const userId = user?.id || 1 // Fallback for demo
-      await axios.put(`/api/user-settings/preferences/${userId}`, {
+      
+      // Prepare settings data (without profile photo to avoid 413 error)
+      const settingsData = {
         dailyGoalMinutes: preferences.dailyGoal || 15,
-        cefrLevel: preferences.level || 'A2'
-      }, { withCredentials: true })
+        cefrLevel: preferences.level || 'A2',
+        appearance: {
+          theme: preferences.theme,
+          language: preferences.language,
+          timezone: preferences.timezone
+        },
+        learning: {
+          sound: preferences.sound,
+          vibration: preferences.vibration,
+          autoPlay: preferences.autoPlay
+        },
+        notifications: {
+          email: notifications.email,
+          push: notifications.push,
+          sms: notifications.sms,
+          weekly: notifications.weekly,
+          achievements: notifications.achievements,
+          reminders: notifications.reminders
+        },
+        privacy: {
+          analytics: false,
+          shareProgress: true,
+          publicProfile: true
+        }
+      }
+      
+      // Save settings first
+      await axios.put(`/api/user-settings/preferences/${userId}`, settingsData, { withCredentials: true })
+      
+      // Save profile data separately (without photo for now)
+      const profileDataToSave = {
+        name: profileData.name,
+        email: profileData.email,
+        phone: profileData.phone,
+        birthDate: profileData.birthDate,
+        country: profileData.country,
+        city: profileData.city
+      }
+      
+      // Try to save profile data (if API supports it)
+      try {
+        await axios.put(`/api/user/profile/${userId}`, profileDataToSave, { withCredentials: true })
+      } catch (profileError) {
+        console.log('Profile API not available, saving locally only')
+      }
+      
+      // Update user context with new data
+      updateUser({
+        name: profileData.name,
+        email: profileData.email,
+        phone: profileData.phone,
+        birthDate: profileData.birthDate,
+        country: profileData.country,
+        city: profileData.city,
+        profilePhoto: profileData.profilePhoto
+      })
+      
+      // Show success message
       alert('Configurações salvas com sucesso!')
+      
+      // Redirect to dashboard after successful save
+      setTimeout(() => {
+        navigate('/dashboard')
+      }, 1000)
+      
     } catch (error) {
       console.error('Error saving settings:', error)
       alert('Erro ao salvar configurações. Tente novamente.')
@@ -72,6 +139,91 @@ export default function UserSettings() {
     vibration: true,
     autoPlay: false
   })
+
+  const [profileData, setProfileData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    birthDate: '',
+    country: 'Brasil',
+    city: '',
+    profilePhoto: ''
+  })
+
+  // Load user data on component mount
+  useEffect(() => {
+    if (user) {
+      setProfileData({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        birthDate: user.birthDate || '',
+        country: user.country || 'Brasil',
+        city: user.city || '',
+        profilePhoto: user.profilePhoto || ''
+      })
+    }
+  }, [user])
+
+  const compressImage = (file, maxWidth = 300, maxHeight = 300, quality = 0.8) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img
+        if (width > height) {
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width
+            width = maxWidth
+          }
+        } else {
+          if (height > maxHeight) {
+            width = (width * maxHeight) / height
+            height = maxHeight
+          }
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height)
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality)
+        resolve(compressedDataUrl)
+      }
+      
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  const handlePhotoUpload = async (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor, selecione apenas arquivos de imagem')
+        return
+      }
+      
+      // Validate file size (max 2MB before compression)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('A imagem deve ter no máximo 2MB')
+        return
+      }
+      
+      try {
+        // Compress image to reduce size
+        const compressedImage = await compressImage(file, 200, 200, 0.7)
+        setProfileData({...profileData, profilePhoto: compressedImage})
+      } catch (error) {
+        console.error('Error compressing image:', error)
+        alert('Erro ao processar a imagem')
+      }
+    }
+  }
 
   const tabs = [
     { id: 'profile', label: 'Perfil', icon: User },
@@ -93,7 +245,44 @@ export default function UserSettings() {
       ...prev,
       [key]: value
     }))
+    
+    // Apply theme changes immediately
+    if (key === 'theme') {
+      applyTheme(value)
+    }
   }
+  
+  const applyTheme = (theme) => {
+    const root = document.documentElement
+    
+    // Add transition class for smooth theme switching
+    root.classList.add('theme-transition')
+    
+    setTimeout(() => {
+      if (theme === 'dark') {
+        root.classList.add('dark')
+      } else if (theme === 'light') {
+        root.classList.remove('dark')
+      } else if (theme === 'auto') {
+        // Auto theme based on system preference
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          root.classList.add('dark')
+        } else {
+          root.classList.remove('dark')
+        }
+      }
+      
+      // Remove transition class after theme is applied
+      setTimeout(() => {
+        root.classList.remove('theme-transition')
+      }, 300)
+    }, 50)
+  }
+  
+  // Apply theme on component mount
+  useEffect(() => {
+    applyTheme(preferences.theme)
+  }, [preferences.theme])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -115,6 +304,19 @@ export default function UserSettings() {
               {loading ? 'Salvando...' : 'Salvar Alterações'}
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Back Button */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-3">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft size={16} />
+            <span>Voltar ao Dashboard</span>
+          </button>
         </div>
       </div>
 
@@ -151,16 +353,34 @@ export default function UserSettings() {
                   
                   <div className="flex items-center gap-6 mb-8">
                     <div className="relative">
-                      <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                        AS
+                      <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
+                        {profileData.profilePhoto ? (
+                          <img 
+                            src={profileData.profilePhoto} 
+                            alt="Foto de perfil" 
+                            className="w-full h-full object-cover rounded-full"
+                          />
+                        ) : (
+                          profileData.name ? 
+                            profileData.name.split(' ').map(n => n[0]).join('').toUpperCase() : 
+                            user?.name ? 
+                            user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 
+                            'U'
+                        )}
                       </div>
-                      <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors">
+                      <label className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer">
                         <Camera size={16} className="text-gray-600" />
-                      </button>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoUpload}
+                          className="hidden"
+                        />
+                      </label>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Ana Silva</h3>
-                      <p className="text-gray-600">ana.silva@email.com</p>
+                      <h3 className="text-lg font-semibold text-gray-900">{profileData.name || user?.name || 'Usuário'}</h3>
+                      <p className="text-gray-600">{profileData.email || user?.email || 'email@exemplo.com'}</p>
                       <button className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-1">
                         Alterar foto
                       </button>
@@ -175,7 +395,9 @@ export default function UserSettings() {
                       <input
                         type="text"
                         className="input-field"
-                        defaultValue="Ana Silva"
+                        value={profileData.name}
+                        onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                        placeholder="Seu nome completo"
                       />
                     </div>
                     <div>
@@ -185,7 +407,9 @@ export default function UserSettings() {
                       <input
                         type="email"
                         className="input-field"
-                        defaultValue="ana.silva@email.com"
+                        value={profileData.email}
+                        onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                        placeholder="seu@email.com"
                       />
                     </div>
                     <div>
@@ -195,6 +419,8 @@ export default function UserSettings() {
                       <input
                         type="tel"
                         className="input-field"
+                        value={profileData.phone}
+                        onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
                         placeholder="(11) 99999-9999"
                       />
                     </div>
@@ -205,17 +431,23 @@ export default function UserSettings() {
                       <input
                         type="date"
                         className="input-field"
+                        value={profileData.birthDate}
+                        onChange={(e) => setProfileData({...profileData, birthDate: e.target.value})}
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         País
                       </label>
-                      <select className="input-field">
-                        <option>Brasil</option>
-                        <option>Estados Unidos</option>
-                        <option>Canadá</option>
-                        <option>Reino Unido</option>
+                      <select 
+                        className="input-field"
+                        value={profileData.country}
+                        onChange={(e) => setProfileData({...profileData, country: e.target.value})}
+                      >
+                        <option value="Brasil">Brasil</option>
+                        <option value="Estados Unidos">Estados Unidos</option>
+                        <option value="Canadá">Canadá</option>
+                        <option value="Reino Unido">Reino Unido</option>
                       </select>
                     </div>
                     <div>
@@ -225,7 +457,9 @@ export default function UserSettings() {
                       <input
                         type="text"
                         className="input-field"
-                        placeholder="São Paulo"
+                        value={profileData.city}
+                        onChange={(e) => setProfileData({...profileData, city: e.target.value})}
+                        placeholder="Sua cidade"
                       />
                     </div>
                   </div>

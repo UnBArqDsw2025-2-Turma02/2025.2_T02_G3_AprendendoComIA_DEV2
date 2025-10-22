@@ -38,23 +38,26 @@ public class GamificationService {
         List<Map<String, Object>> leaderboard = new ArrayList<>();
         
         for (User user : allUsers) {
-            long xp = calculateUserXP(user.getId());
-            long streak = calculateUserStreak(user.getId());
+            // Use real XP from database
+            Integer xp = user.getTotalXp() != null ? user.getTotalXp() : 0;
+            Integer level = user.getLevel() != null ? user.getLevel() : 1;
+            Integer streak = user.getStreakDays() != null ? user.getStreakDays() : 0;
             
             Map<String, Object> userData = new HashMap<>();
             userData.put("id", user.getId());
             userData.put("name", user.getName());
             userData.put("email", user.getEmail());
-            userData.put("cefrLevel", user.getCefrLevel().toString());
+            userData.put("cefrLevel", user.getCefrLevel() != null ? user.getCefrLevel().toString() : "A1");
             userData.put("xp", xp);
+            userData.put("level", level);
             userData.put("streak", streak);
-            userData.put("totalMinutes", user.getTotalMinutes());
+            userData.put("totalMinutes", user.getTotalMinutes() != null ? user.getTotalMinutes() : 0);
             
             leaderboard.add(userData);
         }
         
         // Ordenar por XP
-        leaderboard.sort((a, b) -> Long.compare((Long) b.get("xp"), (Long) a.get("xp")));
+        leaderboard.sort((a, b) -> Integer.compare((Integer) b.get("xp"), (Integer) a.get("xp")));
         
         // Limitar resultados
         if (leaderboard.size() > limit) {
@@ -77,7 +80,7 @@ public class GamificationService {
         List<Map<String, Object>> allUserData = new ArrayList<>();
         
         for (User u : allUsers) {
-            long xp = calculateUserXP(u.getId());
+            Integer xp = u.getTotalXp() != null ? u.getTotalXp() : 0;
             Map<String, Object> userData = new HashMap<>();
             userData.put("id", u.getId());
             userData.put("xp", xp);
@@ -85,7 +88,7 @@ public class GamificationService {
         }
         
         // Ordenar por XP
-        allUserData.sort((a, b) -> Long.compare((Long) b.get("xp"), (Long) a.get("xp")));
+        allUserData.sort((a, b) -> Integer.compare((Integer) b.get("xp"), (Integer) a.get("xp")));
         
         // Encontrar posição do usuário
         int userRank = 1;
@@ -96,8 +99,8 @@ public class GamificationService {
             userRank++;
         }
         
-        long userXP = calculateUserXP(userId);
-        long userStreak = calculateUserStreak(userId);
+        Integer userXP = user.getTotalXp() != null ? user.getTotalXp() : 0;
+        Integer userStreak = user.getStreakDays() != null ? user.getStreakDays() : 0;
         
         Map<String, Object> result = new HashMap<>();
         result.put("rank", userRank);

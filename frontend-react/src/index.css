@@ -19,6 +19,219 @@ body {
   @apply bg-gradient-to-br from-slate-50 to-blue-50;
 }
 
+/* Professional Dark Mode */
+.dark body {
+  background: linear-gradient(to bottom right, #0f172a, #111827, #1e293b);
+}
+
+.dark .card {
+  @apply bg-slate-800/90 border-slate-700/50 backdrop-blur-sm;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.dark .card-hover {
+  @apply bg-slate-800/90 border-slate-700/50 backdrop-blur-sm hover:bg-slate-700/90 hover:border-slate-600/50;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.dark .navbar {
+  @apply bg-slate-900/95 border-slate-700/50 backdrop-blur-md;
+}
+
+.dark .input-field {
+  @apply bg-slate-700/50 border-slate-600/50 text-slate-100 placeholder-slate-400 focus:border-blue-400 focus:ring-blue-400/20;
+}
+
+.dark .btn-secondary {
+  @apply bg-slate-700/50 text-slate-200 border-slate-600/50 hover:bg-slate-600/50 hover:border-slate-500/50;
+}
+
+.dark .btn-outline {
+  @apply bg-transparent text-blue-400 border-blue-500/50 hover:bg-blue-500/10 hover:text-blue-300;
+}
+
+/* Dark mode text colors */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+  @apply text-slate-100;
+}
+
+.dark p, .dark span, .dark div {
+  @apply text-slate-200;
+}
+
+.dark .text-gray-600 {
+  @apply text-slate-400;
+}
+
+.dark .text-gray-500 {
+  @apply text-slate-500;
+}
+
+.dark .text-gray-900 {
+  @apply text-slate-100;
+}
+
+.dark .text-gray-700 {
+  @apply text-slate-300;
+}
+
+/* Dark mode backgrounds */
+.dark .bg-white {
+  @apply bg-slate-800/90;
+}
+
+.dark .bg-gray-50 {
+  @apply bg-slate-700/30;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-slate-700/50;
+}
+
+.dark .bg-gray-200 {
+  @apply bg-slate-600/50;
+}
+
+/* Dark mode borders */
+.dark .border-gray-200 {
+  @apply border-slate-700/50;
+}
+
+.dark .border-gray-300 {
+  @apply border-slate-600/50;
+}
+
+.dark .border-gray-100 {
+  @apply border-slate-800/50;
+}
+
+/* Dark mode shadows */
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+}
+
+.dark .shadow-xl {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+.dark .shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Dark mode gradients */
+.dark .bg-gradient-to-br {
+  background: linear-gradient(to bottom right, #0f172a, #111827, #1e293b);
+}
+
+/* Dark mode specific components */
+.dark .level-badge {
+  background: linear-gradient(to right, #9333ea, #ec4899);
+  @apply text-white;
+}
+
+.dark .xp-badge {
+  background: linear-gradient(to right, #2563eb, #06b6d4);
+  @apply text-white;
+}
+
+.dark .progress-bar {
+  @apply bg-slate-700/50;
+}
+
+.dark .progress-fill {
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
+}
+
+/* Dark mode animations */
+.dark .streak-fire {
+  @apply text-orange-400 animate-pulse;
+}
+
+.dark .heart {
+  @apply text-red-400 animate-pulse;
+}
+
+.dark .gem {
+  @apply text-blue-400;
+}
+
+/* Smooth transitions for dark mode */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-transition * {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dark mode specific improvements */
+.dark .hero-gradient {
+  background: linear-gradient(to bottom right, #1e293b, #334155, #0f172a);
+}
+
+.dark .text-gradient {
+  background: linear-gradient(to right, #60a5fa, #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Dark mode form elements */
+.dark select {
+  @apply bg-slate-700/50 border-slate-600/50 text-slate-100;
+}
+
+.dark option {
+  @apply bg-slate-700 text-slate-100;
+}
+
+/* Dark mode table styles */
+.dark table {
+  @apply bg-slate-800/50;
+}
+
+.dark th {
+  @apply bg-slate-700/50 text-slate-200 border-slate-600/50;
+}
+
+.dark td {
+  @apply bg-slate-800/30 text-slate-200 border-slate-600/30;
+}
+
+.dark tr:hover {
+  @apply bg-slate-700/30;
+}
+
+/* Dark mode navigation */
+.dark nav {
+  @apply bg-slate-900/95 backdrop-blur-md;
+}
+
+.dark nav button {
+  @apply text-slate-300 hover:text-slate-100 hover:bg-slate-700/50;
+}
+
+.dark nav button.active {
+  @apply text-blue-400 bg-slate-700/50;
+}
+
+/* Dark mode status indicators */
+.dark .status-active {
+  @apply bg-green-900/50 text-green-300 border-green-700/50;
+}
+
+.dark .status-inactive {
+  @apply bg-red-900/50 text-red-300 border-red-700/50;
+}
+
+.dark .status-pending {
+  @apply bg-yellow-900/50 text-yellow-300 border-yellow-700/50;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -55,7 +268,8 @@ code {
   }
   
   .progress-fill {
-    @apply h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full transition-all duration-500;
+    @apply h-full rounded-full transition-all duration-500;
+    background: linear-gradient(to right, #60a5fa, #3b82f6);
   }
   
   .streak-fire {
@@ -63,11 +277,13 @@ code {
   }
   
   .level-badge {
-    @apply bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-full font-bold text-sm;
+    @apply text-white px-4 py-2 rounded-full font-bold text-sm;
+    background: linear-gradient(to right, #a855f7, #ec4899);
   }
   
   .xp-badge {
-    @apply bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-3 py-1 rounded-full font-semibold text-sm;
+    @apply text-white px-3 py-1 rounded-full font-semibold text-sm;
+    background: linear-gradient(to right, #3b82f6, #06b6d4);
   }
   
   .heart {
@@ -99,11 +315,14 @@ code {
   }
   
   .hero-gradient {
-    @apply bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600;
+    background: linear-gradient(to bottom right, #60a5fa, #3b82f6, #2563eb);
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent;
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   /* Friendly animations */
