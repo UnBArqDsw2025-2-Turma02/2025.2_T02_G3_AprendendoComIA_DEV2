@@ -219,8 +219,11 @@ public class VocabularyController {
     @GetMapping("/words/iterate/cefr/{cefrLevel}")
     public ResponseEntity<Map<String, Object>> iterateWordsByCefr(@PathVariable String cefrLevel) {
         try {
+
             List<VocabularyWord> words = vocabularyWordRepository.findByCefrLevel(cefrLevel);
+
             VocabularyWordCollection collection = new VocabularyWordCollection(words);
+            
             IIterator iterator = collection.createIterator();
             
             List<String> wordList = new ArrayList<>();
