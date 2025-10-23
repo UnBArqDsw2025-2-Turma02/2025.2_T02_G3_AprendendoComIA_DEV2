@@ -65,4 +65,20 @@ public class VocabularyWord {
     public Integer getXpReward() {
         return xpReward;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getPortugueseTranslation() {
+        return portugueseTranslation;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public String getCefrLevel() {
+        return cefrLevel;
+    }
 }
