@@ -44,18 +44,14 @@ public class AuthService {
             cefrLevel = User.CefrLevel.A2;
         }
         
-        User user = User.builder()
-                .email(email)
-                .name(name)
-                .password(passwordEncoder.encode(password))
-                .cefrLevel(cefrLevel)
-                .dailyGoalMinutes(15)
-                .streakDays(0)
-                .totalMinutes(0)
-                .createdAt(LocalDateTime.now())
-                .build();
-        
-        userRepository.save(user);
+        User user = com.ailinguo.prototype.PrototypeRegistry
+                .defaultUserProfile()
+                .cloneWith(
+                        email,
+                        name,
+                        passwordEncoder.encode(password),
+                        cefrLevel
+                );\n\n        userRepository.save(user);
         
         String token = jwtUtil.generateToken(user.getId().toString(), user.getEmail());
         setAuthCookie(response, token);
