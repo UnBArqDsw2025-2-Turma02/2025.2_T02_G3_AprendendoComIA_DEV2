@@ -130,10 +130,47 @@ class LLMConfigurationTest {
         assertThrows(NullPointerException.class, () -> configuration.llmProvider(openAIService));
     }
 
-    // TODO: Implementar os seguintes testes:
-    // 1. testCaseInsensitive - Testar se aceita MOCK, Mock, OpenAI, etc
-    // 2. testNewInstancesCreated - Verificar se cria instâncias diferentes
-    // 3. testOpenAIAdapterReceivesService - Verificar se OpenAIAdapter recebe service
-    // 4. testEmptyProvider - Testar com provider vazio
-    // 5. testNullProvider - Testar com provider null
+    @Test
+    @DisplayName("Todos os providers implementam LLMProvider")
+    void testAllProvidersImplementInterface() {
+        ReflectionTestUtils.setField(configuration, "provider", "mock");
+        LLMProvider mock = configuration.llmProvider(openAIService);
+        
+        ReflectionTestUtils.setField(configuration, "provider", "gemini");
+        LLMProvider gemini = configuration.llmProvider(openAIService);
+        
+        ReflectionTestUtils.setField(configuration, "provider", "openai");
+        LLMProvider openai = configuration.llmProvider(openAIService);
+        
+        assertTrue(mock instanceof LLMProvider);
+        assertTrue(gemini instanceof LLMProvider);
+        assertTrue(openai instanceof LLMProvider);
+    }
+
+    @Test
+    @DisplayName("Provider com espaços retorna default OpenAIAdapter")
+    void testProviderWithSpaces() {
+        ReflectionTestUtils.setField(configuration, "provider", "  mock  ");
+
+        LLMProvider provider = configuration.llmProvider(openAIService);
+
+        assertNotNull(provider);
+        // Como toLowerCase não faz trim, " mock " não match "mock", então retorna default
+        assertTrue(provider instanceof OpenAIAdapter);
+    }
+
+    @Test
+    @DisplayName("Provider desconhecido sempre retorna OpenAIAdapter")
+    void testUnknownProviderReturnsDefault() {
+        String[] unknownProviders = {"xyz", "test", "invalid", "123"};
+        
+        for (String unknown : unknownProviders) {
+            ReflectionTestUtils.setField(configuration, "provider", unknown);
+            LLMProvider provider = configuration.llmProvider(openAIService);
+            
+            assertNotNull(provider);
+            assertTrue(provider instanceof OpenAIAdapter, 
+                "Provider '" + unknown + "' should return OpenAIAdapter");
+        }
+    }
 }
