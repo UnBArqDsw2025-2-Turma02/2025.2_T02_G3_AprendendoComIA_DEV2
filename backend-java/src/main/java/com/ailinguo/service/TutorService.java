@@ -3,6 +3,7 @@ package com.ailinguo.service;
 import com.ailinguo.dto.tutor.TutorRequest;
 import com.ailinguo.dto.tutor.TutorResponse;
 import com.ailinguo.model.ChatTurn;
+import com.ailinguo.observer.UserProgressSubject;
 import com.ailinguo.repository.ChatTurnRepository;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,14 @@ public class TutorService {
     
     private final OpenAIService openAIService;
     private final ChatTurnRepository chatTurnRepository;
+    private final UserProgressSubject userProgressSubject;
     
-    public TutorService(OpenAIService openAIService, ChatTurnRepository chatTurnRepository) {
+    public TutorService(OpenAIService openAIService, 
+                       ChatTurnRepository chatTurnRepository,
+                       UserProgressSubject userProgressSubject) {
         this.openAIService = openAIService;
         this.chatTurnRepository = chatTurnRepository;
+        this.userProgressSubject = userProgressSubject;
     }
     
     public TutorResponse processTutorRequest(TutorRequest request, Long userId) {
@@ -27,6 +32,12 @@ public class TutorService {
         // Save chat history if session ID is provided
         if (userId != null && request.getSessionId() != null) {
             saveChatTurns(request, response, userId);
+            
+            // Notify observers about XP gain (10 XP per interaction)
+            userProgressSubject.userGainedXp(userId, 10, 10);
+            
+            // Notify task completion
+            userProgressSubject.userCompletedTask(userId, "CHAT_INTERACTION");
         }
         
         return response;
