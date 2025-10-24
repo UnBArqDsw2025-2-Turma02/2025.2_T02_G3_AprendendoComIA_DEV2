@@ -5,8 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 class LLMConfigurationTest {
 
@@ -127,7 +131,8 @@ class LLMConfigurationTest {
     void testNullProvider() {
         ReflectionTestUtils.setField(configuration, "provider", null);
 
-        assertThrows(NullPointerException.class, () -> configuration.llmProvider(openAIService));
+        NullPointerException thrown = assertThrows(NullPointerException.class, () -> configuration.llmProvider(openAIService));
+        assertNotNull(thrown);
     }
 
     @Test
@@ -173,4 +178,7 @@ class LLMConfigurationTest {
                 "Provider '" + unknown + "' should return OpenAIAdapter");
         }
     }
+
+
+    
 }
