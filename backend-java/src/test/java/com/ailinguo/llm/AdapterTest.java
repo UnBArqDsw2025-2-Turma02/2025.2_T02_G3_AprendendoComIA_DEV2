@@ -178,10 +178,52 @@ class AdapterTest {
         assertNull(response);
     }
 
-    // TODO: Implementar os seguintes testes:
-    // 1. testMockAdapterMiniExercise - Verificar se MockAdapter gera mini exercício correto
-    // 2. testOpenAIAdapterPassesCorrectRequest - Verificar se OpenAIAdapter passa request correto
-    // 3. testMockAdapterWithNullText - Testar MockAdapter com texto null
-    // 4. testMockAdapterCompleteResponse - Verificar resposta completa do MockAdapter
-    // 5. testOpenAIAdapterWithNullResponse - Testar OpenAIAdapter com resposta null do service
+    @Test
+    @DisplayName("MockAdapter mantém texto original na correção")
+    void testMockAdapterPreservesOriginalText() {
+        MockAdapter adapter = new MockAdapter();
+        
+        TutorResponse response = adapter.tutor(sampleRequest);
+        
+        TutorResponse.Correction correction = response.getCorrections().get(0);
+        assertEquals(sampleRequest.getUserText(), correction.getOriginal());
+    }
+
+    @Test
+    @DisplayName("GeminiAdapter sempre retorna resposta não null")
+    void testGeminiAdapterNeverNull() {
+        GeminiAdapter adapter = new GeminiAdapter();
+        
+        TutorResponse response1 = adapter.tutor(sampleRequest);
+        TutorResponse response2 = adapter.tutor(new TutorRequest());
+        
+        assertNotNull(response1);
+        assertNotNull(response2);
+    }
+
+    @Test
+    @DisplayName("MockAdapter options contém resposta correta")
+    void testMockAdapterCorrectAnswer() {
+        MockAdapter adapter = new MockAdapter();
+        
+        TutorResponse response = adapter.tutor(sampleRequest);
+        TutorResponse.MiniExercise ex = response.getMiniExercise();
+        
+        assertEquals("went", ex.getOptions().get(ex.getCorrect()));
+    }
+
+    @Test
+    @DisplayName("Todos adapters tratam diferentes modos de request")
+    void testAdaptersWithDifferentModes() {
+        sampleRequest.setMode(TutorRequest.Mode.WRITING);
+        
+        MockAdapter mockAdapter = new MockAdapter();
+        GeminiAdapter geminiAdapter = new GeminiAdapter();
+        
+        TutorResponse mockResponse = mockAdapter.tutor(sampleRequest);
+        TutorResponse geminiResponse = geminiAdapter.tutor(sampleRequest);
+        
+        assertNotNull(mockResponse);
+        assertNotNull(geminiResponse);
+    }
 }
