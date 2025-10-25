@@ -51,7 +51,8 @@ public class AuthService {
                         name,
                         passwordEncoder.encode(password),
                         cefrLevel
-                );\n\n        userRepository.save(user);
+                );
+        userRepository.save(user);
         
         String token = jwtUtil.generateToken(user.getId().toString(), user.getEmail());
         setAuthCookie(response, token);

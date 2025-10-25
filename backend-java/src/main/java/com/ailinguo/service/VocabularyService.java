@@ -5,6 +5,7 @@ import com.ailinguo.dto.vocabulary.VocabularyReviewResponse;
 import com.ailinguo.model.SrsReview;
 import com.ailinguo.model.User;
 import com.ailinguo.model.VocabularyCard;
+import com.ailinguo.observer.UserProgressSubject;
 import com.ailinguo.repository.SrsReviewRepository;
 import com.ailinguo.repository.VocabularyCardRepository;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,14 @@ public class VocabularyService {
     
     private final VocabularyCardRepository vocabularyCardRepository;
     private final SrsReviewRepository srsReviewRepository;
+    private final UserProgressSubject userProgressSubject;
     
     public VocabularyService(VocabularyCardRepository vocabularyCardRepository, 
-                            SrsReviewRepository srsReviewRepository) {
+                            SrsReviewRepository srsReviewRepository,
+                            UserProgressSubject userProgressSubject) {
         this.vocabularyCardRepository = vocabularyCardRepository;
         this.srsReviewRepository = srsReviewRepository;
+        this.userProgressSubject = userProgressSubject;
     }
     
     public List<VocabularyCard> getDueCards(Long userId, int limit) {
@@ -100,6 +104,12 @@ public class VocabularyService {
                 .build();
         
         srsReviewRepository.save(review);
+        
+        // Notify observers about vocabulary review
+        Long userIdLong = Long.parseLong(request.getUserId());
+        Integer xpGained = request.getResult() == SrsReview.ReviewResult.EASY ? 15 : 5;
+        userProgressSubject.userGainedXp(userIdLong, xpGained, xpGained);
+        userProgressSubject.userCompletedTask(userIdLong, "VOCABULARY_REVIEW");
         
         return VocabularyReviewResponse.builder()
                 .success(true)
